@@ -31,13 +31,14 @@ def get_users():
                     'Date Joined' : result[i][6]        
                 }
             })
+        conn.close()
         return users
     except Exception as e:
         cursor.rollback()
         return False
-    except:
-        if cursor.connected == 1:
-            cursor.closed()
+    else:
+        if conn.connected == 1:
+            conn.closed()
    
 
 def get_user(uname):
@@ -46,21 +47,22 @@ def get_user(uname):
         cursor = conn.cursor()
         cursor.execute(f"SELECT * FROM Users where Username = '{uname}'")
         result = list(cursor)
+        conn.close()
         return {
             'Username' : result[0][0],
             'FirstName' : result[0][1],
             'LastName' : result[0][2],
             'City' : result[0][3],
             'Email' : result[0][4],
+            'Password' : result[0][5],
             'Date Joined' : result[0][6]        
             }   
-        conn.close
     except Exception as e:
         cursor.rollback()
         return False
     else:
-        if cursor.connected == 1:
-            cursor.closed()
+        if conn.connected == 1:
+            conn.closed()
 
 def post_user(
     uname,
@@ -84,7 +86,7 @@ def post_user(
         print(e)
         cursor.rollback()
         return False
-    except:
+    else:
         if conn.connected == 1:
             conn.closed()
 
