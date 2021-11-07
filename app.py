@@ -6,7 +6,7 @@ import datetime
 import jwt
 import json
 from bson import json_util
-from functools import wraps
+# from functools import wraps
 from db import get_user, get_users, post_user, update_user
 
 app = Flask(__name__)
@@ -16,7 +16,7 @@ CORS(app)
 
 
 def token_required(f):
-    @wraps(f)
+    # @wraps(f)
     def decorated(*args, **kwargs):
         token = None
         if 'x-access-token' in request.headers:
@@ -32,7 +32,7 @@ def token_required(f):
             print(e)
             return {'msg': 'Token is invalid'}, 401
 
-        return f(*args, **kwargs)
+        # return f(*args, **kwargs)
     return decorated
 
 class Login(Resource):
