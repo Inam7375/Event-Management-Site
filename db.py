@@ -1,12 +1,15 @@
-import pyodbc 
+from sqlite3.dbapi2 import Cursor
+# import pyodbc 
+import sqlite3
 import pandas as pd
 
-df = pd.read_csv('creds.csv')
+# df = pd.read_csv('creds.csv')
 def connect():
-    conn = pyodbc.connect('Driver={SQL Server};'
-                      f'Server={df["Server"][0]};'
-                      f'Database={df["Database Name"][0]};'
-                      'Trusted_Connection=yes;')
+    # conn = pyodbc.connect('Driver={SQL Server};'
+    #                   f'Server={df["Server"][0]};'
+    #                   f'Database={df["Database Name"][0]};'
+    #                   'Trusted_Connection=yes;')
+    conn = sqlite3.connect('Users.sqlite')
 
     return conn
 
@@ -34,7 +37,7 @@ def get_users():
         conn.close()
         return users
     except Exception as e:
-        cursor.rollback()
+        # cursor.rollback()
         return False
     else:
         if conn.connected == 1:
@@ -58,7 +61,7 @@ def get_user(uname):
             'Date Joined' : result[0][6]        
             }   
     except Exception as e:
-        cursor.rollback()
+        # cursor.rollback()
         return False
     else:
         if conn.connected == 1:
@@ -79,12 +82,12 @@ def post_user(
         cursor.execute(
             f"insert into Users ([Username], [FirstName], [LastName], [City], [Email], [Password], [Date]) values ('{uname}', '{fname}', '{lname}', '{city}', '{email}', '{password}', '{date}')"
         )
-        cursor.commit()
+        conn.commit()
         conn.close()
         return 'User has been successfully created'
     except Exception as e:
         print(e)
-        cursor.rollback()
+        conn.rollback()
         return False
     else:
         if conn.connected == 1:
@@ -104,19 +107,32 @@ def update_user(
         cursor.execute(
             f"update Users set FirstName='{fname}', LastName='{lname}', City='{city}', Email='{email}', Password='{password}' where  Username='{uname}'"
         )
-        cursor.commit()
+        conn.commit()
         conn.close()
         return 'User has been successfully updated'
     except Exception as e:
         print(e)
-        cursor.rollback()
+        conn.rollback()
         return False
     else:
         if conn.connected == 1:
             conn.closed()
 
 if __name__=="__main__":
-    print(get_users())
+    conn = connect()
+    cursor = conn.cursor()
+    sql_query = """
+        CREATE TABLE Users(
+        [Username] [nvarchar](255) NULL,
+        [FirstName] [varchar](255) NULL,
+        [LastName] [varchar](255) NULL,
+        [City] [varchar](255) NULL,
+        [Email] [nvarchar](255) NULL,
+        [Password] [nvarchar](320) NULL,
+        [Date] [date] NULL)
+    """
+    cursor.execute(sql_query)
+    # print(get_users())
     # print(post_user(
     #     uname = "someone",
     #     fname = "Van",

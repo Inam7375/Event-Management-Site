@@ -1,4 +1,3 @@
-import json
 from werkzeug.security import check_password_hash
 from flask import Flask, request, make_response, jsonify
 from flask_restful import Resource, Api
@@ -112,7 +111,7 @@ class UserActions(Resource):
             return {'msg': resp}, 200
         except Exception:
             return {'msg': 'Error creating user'}, 500
-
+    @token_required
     def put(self):
         data = request.get_json(force=True)
         try:
