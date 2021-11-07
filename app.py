@@ -27,7 +27,7 @@ def token_required(f):
 
         try:
             data = jwt.decode(token, app.config['SECRET_KEY'])
-            current_user = get_user(data['username'])
+            # current_user = get_user(data['username'])
         except Exception as e:
             print(e)
             return {'msg': 'Token is invalid'}, 401
