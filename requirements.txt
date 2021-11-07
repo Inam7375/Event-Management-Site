@@ -1,4 +1,3 @@
-json
 werkzeug
 flask
 flask_restful
