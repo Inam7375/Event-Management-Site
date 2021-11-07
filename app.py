@@ -6,7 +6,7 @@ import datetime
 import jwt
 import json
 from bson import json_util
-# from functools import wraps
+from functools import wraps
 from db import get_user, get_users, post_user, update_user
 
 app = Flask(__name__)
@@ -16,7 +16,7 @@ CORS(app)
 
 
 def token_required(f):
-    # @wraps(f)
+    @wraps(f)
     def decorated(*args, **kwargs):
         token = None
         if 'x-access-token' in request.headers:
@@ -27,12 +27,12 @@ def token_required(f):
 
         try:
             data = jwt.decode(token, app.config['SECRET_KEY'])
-            # current_user = get_user(data['username'])
+            current_user = get_user(data['username'])
         except Exception as e:
             print(e)
             return {'msg': 'Token is invalid'}, 401
 
-        # return f(*args, **kwargs)
+        return f(current_user, *args, **kwargs)
     return decorated
 
 class Login(Resource):
@@ -112,7 +112,7 @@ class UserActions(Resource):
         except Exception:
             return {'msg': 'Error creating user'}, 500
     @token_required
-    def put(self):
+    def put(self, current_user):
         data = request.get_json(force=True)
         try:
             username = data['username']

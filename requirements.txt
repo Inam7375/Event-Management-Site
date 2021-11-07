@@ -6,4 +6,5 @@ flask_cors
 datetime
 jwt
 bson
+functools
 pandas
