@@ -68,7 +68,7 @@ class Login(Resource):
                 },
                     app.config['SECRET_KEY']
                 )
-            return {'token': str(token, 'utf-8')}, 200
+            return {'token': token.decode('UTF-8')}, 200
         # except Exception as e:
         #     print(e)
         #     return make_response(

@@ -4,6 +4,6 @@ gunicorn
 flask_restful
 flask_cors
 datetime
-pyjwt
+PyJWT==1.7.1
 bson
 pandas
