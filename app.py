@@ -37,7 +37,7 @@ def token_required(f):
 
 class Login(Resource):
     def post(self):
-        # try:
+        try:
             data = request.get_json(force=True)
             username = data['username']
             password = data['password']
@@ -69,12 +69,12 @@ class Login(Resource):
                     app.config['SECRET_KEY']
                 )
             return {'token': token.decode('UTF-8')}, 200
-        # except Exception as e:
-        #     print(e)
-        #     return make_response(
-        #             'Could not authenticate',
-        #             401,
-        #             {'WWW-Authenticate': 'Basic realm="Login required!"'})
+        except Exception as e:
+            print(e)
+            return make_response(
+                    'Could not authenticate',
+                    401,
+                    {'WWW-Authenticate': 'Basic realm="Login required!"'})
 
 class GetUsers(Resource):
     def get(self):
