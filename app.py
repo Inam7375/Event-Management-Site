@@ -87,7 +87,7 @@ class GetUsers(Resource):
 
 class GetUser(Resource):
     @token_required
-    def get(self):
+    def get(self, cur_user):
         try:
             token = request.headers['x-access-token']
             user = jwt.decode(token, 'mysecretkey')
