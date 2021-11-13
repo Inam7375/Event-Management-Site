@@ -7,7 +7,7 @@ import jwt
 import json
 # from bson import json_util
 from functools import wraps
-from db import get_user, get_users, post_user, update_user
+from db import get_user, get_users, post_user, update_user, get_rwp_designs, get_all_designs, get_isb_designs
 
 app = Flask(__name__)
 api = Api(app)
@@ -84,6 +84,33 @@ class GetUsers(Resource):
         except Exception as e:
             return {'msg': 'User not found'}, 500
 
+class AllDesigns(Resource):
+    @token_required
+    def get(self, cur_user):
+        try:
+            designs = get_all_designs()
+            return {'Designs' : designs}, 200
+        except Exception as e:
+            return {'msg': 'User not found'}, 500
+
+class RwpDesigns(Resource):
+    @token_required
+    def get(self, cur_user):
+        try:
+            designs = get_rwp_designs()
+            return {'Designs' : designs}, 200
+        except Exception as e:
+            return {'msg': 'User not found'}, 500
+
+class IsbDesigns(Resource):
+    @token_required
+    def get(self, cur_user):
+        try:
+            designs = get_isb_designs()
+            return {'Designs' : designs}, 200
+        except Exception as e:
+            return {'msg': 'User not found'}, 500
+
 
 class GetUser(Resource):
     @token_required
@@ -130,6 +157,9 @@ api.add_resource(Login, '/api/login')
 api.add_resource(GetUsers, '/api/users/')
 api.add_resource(GetUser, '/api/user/')
 api.add_resource(UserActions, '/api/useractions')
+# api.add_resource(AllDesigns, '/api/designs')
+api.add_resource(RwpDesigns, '/api/designs/rawalpindi')
+api.add_resource(IsbDesigns, '/api/designs/islamabad')
 
 if __name__=='__main__':
     app.run(debug=True)
