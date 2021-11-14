@@ -201,7 +201,7 @@ def user_likes_design(image, username):
         conn = connect()
         cursor = conn.cursor()
         cursor.execute(
-            f"insert into UserDesigns ([Username], [Image]) values ('{image}', '{username}')"
+            f"insert into UserDesigns ([Username], [Image]) values ('{username}', '{image}')"
         )
         conn.commit()
         conn.close()
@@ -219,7 +219,7 @@ def user_dislikes_design(image, username):
         conn = connect()
         cursor = conn.cursor()
         cursor.execute(
-            f'delete from UserDesigns ([Username], [Image]) where Username = "{username}" and Image = "{image}"'
+            f'delete from UserDesigns where Username = "{username}" and Image = "{image}"'
         )
         conn.commit()
         conn.close()
@@ -236,21 +236,23 @@ def get_user_designs(username):
     try:
         conn = connect()
         cursor = conn.cursor()
-        cursor.execute(f'SELECT Image FROM UserDesigns WHERE Username = "someone"')
-        # cursor.execute('PRAGMA table_info(UserDesigns);')
-        result = list(cursor)
-        # designs = {}
-        # for i in range(len(result)):
-        #     designs.update({
-        #         f'designs_{i}' : {
-        #             'Image' : result[i][0],
-        #             'City' : result[i][1],
-        #             'Style' : result[i][2],
-        #             'Category' : result[i][3],       
-        #         }
-        #     })
-        # conn.close()
-        return result
+        cursor.execute(f'SELECT Image FROM UserDesigns where Username = "{username}"')
+        results = [i[0] for i in list(cursor)]
+        results = tuple(results)
+        cursor.execute(f'Select * from Designs where Images in {results}')
+        results = list(cursor)
+        designs = {}
+        for i in range(len(results)):
+            designs.update({
+                f'designs_{i}' : {
+                    'Image' : results[i][0],
+                    'City' : results[i][1],
+                    'Style' : results[i][2],
+                    'Category' : results[i][3],       
+                }
+            })
+        conn.close()
+        return designs
     except Exception as e:
         # cursor.rollback()
         return False
@@ -301,9 +303,9 @@ def data_insertion():
             conn.closed()
 
 if __name__=="__main__":
-    # print(get_user_designs('someone'))
+    print(get_user_designs('someone'))
     # print(get_rwp_designs())
-    # data_insertion()
+    # data_insertio n()
     # conn = connect()
     # cursor = conn.cursor()
     # sql_query = """

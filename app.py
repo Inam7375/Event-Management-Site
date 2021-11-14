@@ -7,7 +7,7 @@ import jwt
 import json
 # from bson import json_util
 from functools import wraps
-from db import get_user, get_users, post_user, update_user, get_rwp_designs, get_all_designs, get_isb_designs
+from db import get_user, get_users, post_user, update_user, get_rwp_designs, get_all_designs, get_isb_designs, get_user_designs, user_dislikes_design, user_likes_design
 
 app = Flask(__name__)
 api = Api(app)
@@ -76,13 +76,6 @@ class Login(Resource):
                     401,
                     {'WWW-Authenticate': 'Basic realm="Login required!"'})
 
-class GetUsers(Resource):
-    def get(self):
-        try:
-            users = get_users()
-            return {'Users' : users}, 200
-        except Exception as e:
-            return {'msg': 'User not found'}, 500
 
 class AllDesigns(Resource):
     @token_required
@@ -91,7 +84,7 @@ class AllDesigns(Resource):
             designs = get_all_designs()
             return {'Designs' : designs}, 200
         except Exception as e:
-            return {'msg': 'User not found'}, 500
+            return {'msg': 'Design not found'}, 500
 
 class RwpDesigns(Resource):
     @token_required
@@ -100,7 +93,7 @@ class RwpDesigns(Resource):
             designs = get_rwp_designs()
             return {'Designs' : designs}, 200
         except Exception as e:
-            return {'msg': 'User not found'}, 500
+            return {'msg': 'Design not found'}, 500
 
 class IsbDesigns(Resource):
     @token_required
@@ -109,8 +102,52 @@ class IsbDesigns(Resource):
             designs = get_isb_designs()
             return {'Designs' : designs}, 200
         except Exception as e:
-            return {'msg': 'User not found'}, 500
+            return {'msg': 'Design not found'}, 500
 
+class GetUserLikes(Resource):
+    @token_required
+    def get(self, cur_user):
+        try:
+            token = request.headers['x-access-token']
+            user = jwt.decode(token, 'mysecretkey')
+            user = get_user(user['username'])
+            designs = get_user_designs(user['Username'] )
+            return {'Designs' : designs}, 200
+        except Exception as e:
+            return {'msg': 'Design not found'}, 500
+
+    @token_required
+    def post(self, cur_user):
+        try:
+            data = request.get_json(force=True)
+            token = request.headers['x-access-token']
+            user = jwt.decode(token, 'mysecretkey')
+            user = get_user(user['username'])
+            designs = user_likes_design(data['image'],user['Username'])
+            return {'Designs' : designs}, 200
+        except Exception as e:
+            return {'msg': 'Design not found'}, 500
+
+    @token_required
+    def put(self, cur_user):
+        try:
+            data = request.get_json(force=True)
+            token = request.headers['x-access-token']
+            user = jwt.decode(token, 'mysecretkey')
+            user = get_user(user['username'])
+            designs = user_dislikes_design(data['image'],user['Username'])
+            return {'Designs' : designs}, 200
+        except Exception as e:
+            return {'msg': 'Design not found'}, 500
+
+
+class GetUsers(Resource):
+    def get(self):
+        try:
+            users = get_users()
+            return {'Users' : users}, 200
+        except Exception as e:
+            return {'msg': 'User not found'}, 500
 
 class GetUser(Resource):
     @token_required
@@ -160,6 +197,7 @@ api.add_resource(UserActions, '/api/useractions')
 # api.add_resource(AllDesigns, '/api/designs')
 api.add_resource(RwpDesigns, '/api/designs/rawalpindi')
 api.add_resource(IsbDesigns, '/api/designs/islamabad')
+api.add_resource(GetUserLikes, '/api/designs/userdesign')
 
 if __name__=='__main__':
     app.run(debug=True)
