@@ -127,9 +127,9 @@ def get_rwp_designs():
         cursor = conn.cursor()
         cursor.execute(f'SELECT * FROM Designs where City = "Rawalpindi"')
         result = list(cursor)
-        designs = {}
+        designs = []
         for i in range(len(result)):
-            designs.update({
+            designs.append({
                 f'designs_{i}' : {
                     'Image' : result[i][0],
                     'City' : result[i][1],
@@ -152,9 +152,9 @@ def get_isb_designs():
         cursor = conn.cursor()
         cursor.execute(f'SELECT * FROM Designs where City = "Islamabad"')
         result = list(cursor)
-        designs = {}
+        designs = []
         for i in range(len(result)):
-            designs.update({
+            designs.append({
                 f'designs_{i}' : {
                     'Image' : result[i][0],
                     'City' : result[i][1],
@@ -177,9 +177,9 @@ def get_all_designs():
         cursor = conn.cursor()
         cursor.execute(f'SELECT * FROM Designs')
         result = list(cursor)
-        designs = {}
+        designs = []
         for i in range(len(result)):
-            designs.update({
+            designs.append({
                 f'designs_{i}' : {
                     'Image' : result[i][0],
                     'City' : result[i][1],
@@ -241,9 +241,9 @@ def get_user_designs(username):
         results = tuple(results)
         cursor.execute(f'Select * from Designs where Images in {results}')
         results = list(cursor)
-        designs = {}
+        designs = []
         for i in range(len(results)):
-            designs.update({
+            designs.append({
                 f'designs_{i}' : {
                     'Image' : results[i][0],
                     'City' : results[i][1],
