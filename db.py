@@ -155,12 +155,10 @@ def get_isb_designs():
         designs = []
         for i in range(len(result)):
             designs.append({
-                f'designs_{i}' : {
                     'Image' : result[i][0],
                     'City' : result[i][1],
                     'Style' : result[i][2],
-                    'Category' : result[i][3],       
-                }
+                    'Category' : result[i][3]
             })
         conn.close()
         return designs
@@ -180,12 +178,10 @@ def get_all_designs():
         designs = []
         for i in range(len(result)):
             designs.append({
-                f'designs_{i}' : {
                     'Image' : result[i][0],
                     'City' : result[i][1],
                     'Style' : result[i][2],
-                    'Category' : result[i][3],       
-                }
+                    'Category' : result[i][3]
             })
         conn.close()
         return designs
@@ -244,12 +240,10 @@ def get_user_designs(username):
         designs = []
         for i in range(len(results)):
             designs.append({
-                f'designs_{i}' : {
                     'Image' : results[i][0],
                     'City' : results[i][1],
                     'Style' : results[i][2],
-                    'Category' : results[i][3],       
-                }
+                    'Category' : results[i][3]
             })
         conn.close()
         return designs
