@@ -130,12 +130,10 @@ def get_rwp_designs():
         designs = []
         for i in range(len(result)):
             designs.append({
-                f'designs_{i}' : {
                     'Image' : result[i][0],
                     'City' : result[i][1],
                     'Style' : result[i][2],
                     'Category' : result[i][3],       
-                }
             })
         conn.close()
         return designs
