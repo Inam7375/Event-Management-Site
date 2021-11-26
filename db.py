@@ -127,8 +127,9 @@ def get_rwp_designs(username):
         cursor = conn.cursor()
         cursor.execute(f'SELECT * FROM Designs where City = "Rawalpindi"')
         result = list(cursor)
-        cursor.execute(f'SELECT Username FROM UserDesigns where Image = "{username}"')
+        cursor.execute(f'SELECT Image FROM UserDesigns where Username = "{username}"')
         liked_images = [i[0] for i in list(cursor)]
+        print(liked_images)
         designs = []
         for i in range(len(result)):
             designs.append({
@@ -153,7 +154,7 @@ def get_isb_designs(username):
         cursor = conn.cursor()
         cursor.execute(f'SELECT * FROM Designs where City = "Islamabad"')
         result = list(cursor)
-        cursor.execute(f'SELECT Username FROM UserDesigns where Image = "{username}"')
+        cursor.execute(f'SELECT Image FROM UserDesigns where Username = "{username}"')
         liked_images = [i[0] for i in list(cursor)]
         designs = []
         for i in range(len(result)):
@@ -237,10 +238,9 @@ def get_user_designs(username):
     try:
         conn = connect()
         cursor = conn.cursor()
-        cursor.execute(f'SELECT Username FROM UserDesigns where Image = "{username}"')
+        cursor.execute(f'SELECT Image FROM UserDesigns where Username = "{username}"')
         results = [i[0] for i in list(cursor)]
         results = tuple(results)
-        print(results)
         cursor.execute(f'Select * from Designs where Images in {results[:-1] if len(results) < 1 else results}')
         results = list(cursor)
         designs = []
@@ -303,8 +303,8 @@ def data_insertion():
             conn.closed()
 
 if __name__=="__main__":
-    print(get_users())
-    # print(get_rwp_designs('someone'))
+    # print(get_user_designs('someone'))
+    print(user_likes_design('https://kitandkaboodle.com/wp-content/uploads/2021/10/6R3A0151-1-1024x1024.jpg', 'someone'))
     # data_insertio n()
     # conn = connect()
     # cursor = conn.cursor()

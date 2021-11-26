@@ -114,8 +114,7 @@ class GetUserLikes(Resource):
         try:
             token = request.headers['x-access-token']
             user = jwt.decode(token, 'mysecretkey')
-            user = get_user(user['username'])
-            designs = get_user_designs(user['Username'] )
+            designs = get_user_designs(user['username'] )
             return {'Designs' : designs}, 200
         except Exception as e:
             return {'msg': 'Design not found'}, 500
@@ -124,10 +123,10 @@ class GetUserLikes(Resource):
     def post(self, cur_user):
         try:
             data = request.get_json(force=True)
+            print(data['image'])
             token = request.headers['x-access-token']
             user = jwt.decode(token, 'mysecretkey')
-            user = get_user(user['username'])
-            designs = user_likes_design(data['image'],user['Username'])
+            designs = user_likes_design(data['image'],user['username'])
             return {'Designs' : designs}, 200
         except Exception as e:
             return {'msg': 'Design not found'}, 500
@@ -138,8 +137,7 @@ class GetUserLikes(Resource):
             data = request.get_json(force=True)
             token = request.headers['x-access-token']
             user = jwt.decode(token, 'mysecretkey')
-            user = get_user(user['username'])
-            designs = user_dislikes_design(data['image'],user['Username'])
+            designs = user_dislikes_design(data['image'],user['username'])
             return {'Designs' : designs}, 200
         except Exception as e:
             return {'msg': 'Design not found'}, 500
