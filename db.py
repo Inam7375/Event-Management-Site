@@ -121,19 +121,22 @@ def update_user(
         if conn.connected == 1:
             conn.closed()
 
-def get_rwp_designs():
+def get_rwp_designs(username):
     try:
         conn = connect()
         cursor = conn.cursor()
         cursor.execute(f'SELECT * FROM Designs where City = "Rawalpindi"')
         result = list(cursor)
+        cursor.execute(f'SELECT Username FROM UserDesigns where Image = "{username}"')
+        liked_images = [i[0] for i in list(cursor)]
         designs = []
         for i in range(len(result)):
             designs.append({
                     'Image' : result[i][0],
                     'City' : result[i][1],
                     'Style' : result[i][2],
-                    'Category' : result[i][3],       
+                    'Category' : result[i][3],
+                    'Liked' : 'Yes' if  result[i][0] in liked_images else 'No'   
             })
         conn.close()
         return designs
@@ -144,19 +147,23 @@ def get_rwp_designs():
         if conn.connected == 1:
             conn.closed()
    
-def get_isb_designs():
+def get_isb_designs(username):
     try:
         conn = connect()
         cursor = conn.cursor()
         cursor.execute(f'SELECT * FROM Designs where City = "Islamabad"')
         result = list(cursor)
+        cursor.execute(f'SELECT Username FROM UserDesigns where Image = "{username}"')
+        liked_images = [i[0] for i in list(cursor)]
         designs = []
         for i in range(len(result)):
             designs.append({
                     'Image' : result[i][0],
                     'City' : result[i][1],
                     'Style' : result[i][2],
-                    'Category' : result[i][3]
+                    'Category' : result[i][3],
+                    'Liked' : 'Yes' if  result[i][0] in liked_images else 'No'   
+
             })
         conn.close()
         return designs
@@ -230,10 +237,11 @@ def get_user_designs(username):
     try:
         conn = connect()
         cursor = conn.cursor()
-        cursor.execute(f'SELECT Image FROM UserDesigns where Username = "{username}"')
+        cursor.execute(f'SELECT Username FROM UserDesigns where Image = "{username}"')
         results = [i[0] for i in list(cursor)]
         results = tuple(results)
-        cursor.execute(f'Select * from Designs where Images in {results}')
+        print(results)
+        cursor.execute(f'Select * from Designs where Images in {results[:-1] if len(results) < 1 else results}')
         results = list(cursor)
         designs = []
         for i in range(len(results)):
@@ -295,16 +303,13 @@ def data_insertion():
             conn.closed()
 
 if __name__=="__main__":
-    print(get_user_designs('someone'))
-    # print(get_rwp_designs())
+    print(get_users())
+    # print(get_rwp_designs('someone'))
     # data_insertio n()
     # conn = connect()
     # cursor = conn.cursor()
     # sql_query = """
-    #     CREATE TABLE UserDesigns(
-    #         Username [nvarchar](255),
-    #         Image [nvarchar](255)
-    #     )
+    #     select * from UserDesigns
     # """
     # sql_query = """
     #     CREATE TABLE Designs(
@@ -313,7 +318,7 @@ if __name__=="__main__":
     #     [Styles] [varchar](255) NULL,
     #     [Categories] [nvarchar](255) NULL)
     # """
-    # cursor.execute(sql_query)
+    # print(list(cursor.execute(sql_query)))
     # print(get_users())
     # print(post_user(
     #     uname = "someone",

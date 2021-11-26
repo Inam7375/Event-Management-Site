@@ -90,7 +90,9 @@ class RwpDesigns(Resource):
     @token_required
     def get(self, cur_user):
         try:
-            designs = get_rwp_designs()
+            token = request.headers['x-access-token']
+            user = jwt.decode(token, 'mysecretkey')
+            designs = get_rwp_designs(user['username'])
             return {'Designs' : designs}, 200
         except Exception as e:
             return {'msg': 'Design not found'}, 500
@@ -99,7 +101,9 @@ class IsbDesigns(Resource):
     @token_required
     def get(self, cur_user):
         try:
-            designs = get_isb_designs()
+            token = request.headers['x-access-token']
+            user = jwt.decode(token, 'mysecretkey')
+            designs = get_isb_designs(user['username'])
             return {'Designs' : designs}, 200
         except Exception as e:
             return {'msg': 'Design not found'}, 500
