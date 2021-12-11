@@ -7,7 +7,7 @@ import jwt
 import json
 # from bson import json_util
 from functools import wraps
-from db import get_user, get_users, post_user, update_user, get_rwp_designs, get_all_designs, get_isb_designs, get_user_designs, user_dislikes_design, user_likes_design
+from db import get_user, get_users, post_user, update_user, get_rwp_designs, get_all_designs, get_isb_designs, get_user_designs, user_dislikes_design, user_likes_design, get_search_items, get_most_liked_designs_cat_wise, get_most_liked_designs_cat_city_wise
 
 app = Flask(__name__)
 api = Api(app)
@@ -192,6 +192,41 @@ class UserActions(Resource):
         except Exception:
             return {'msg': 'Error updating user'}, 500
 
+class GetDesignList(Resource):
+    @token_required
+    def get(self, current_user):
+        try:
+            resp = get_search_items()
+            return {'msg': resp}, 200
+        except Exception:
+            return {'msg': 'Error updating user'}, 500
+
+
+class GetCatWiseDesign(Resource):
+    @token_required
+    def get(self, current_user):
+        data = request.get_json(force=True)
+        try:
+            cat = data['cat']
+            resp = get_most_liked_designs_cat_wise(cat)
+            return {'msg': resp}, 200
+        except Exception:
+            return {'msg': 'Error creating user'}, 500
+   
+
+class GetCatCityWiseDesign(Resource):
+    @token_required
+    def get(self, current_user):
+        data = request.get_json(force=True)
+        try:
+            cat = data['cat']
+            city = data['city']
+            resp = get_most_liked_designs_cat_city_wise(cat, city)
+            return {'msg': resp}, 200
+        except Exception:
+            return {'msg': 'Error creating user'}, 500
+    
+
 api.add_resource(Login, '/api/login')
 api.add_resource(GetUsers, '/api/users/')
 api.add_resource(GetUser, '/api/user/')
@@ -200,6 +235,9 @@ api.add_resource(UserActions, '/api/useractions')
 api.add_resource(RwpDesigns, '/api/designs/rawalpindi')
 api.add_resource(IsbDesigns, '/api/designs/islamabad')
 api.add_resource(GetUserLikes, '/api/designs/userdesign')
+api.add_resource(GetDesignList, '/api/searchlist')
+api.add_resource(GetCatWiseDesign, '/api/designs/cat')
+api.add_resource(GetCatCityWiseDesign, '/api/designs/cat/city')
 
 if __name__=='__main__':
     app.run(debug=True)

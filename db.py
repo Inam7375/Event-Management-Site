@@ -4,7 +4,12 @@ import sqlite3
 from numpy.core.fromnumeric import sort
 import pandas as pd
 import os
+import numpy as np
+import itertools 
 
+def unique(list1):
+    x = np.array(list1)
+    return list(np.unique(x))
 
 # df = pd.read_csv('creds.csv')
 def connect():
@@ -261,6 +266,87 @@ def get_user_designs(username):
             conn.closed()
 
 
+def get_most_liked_designs_cat_wise(cat):
+    try:
+        conn = connect()
+        cursor = conn.cursor()
+        cursor.execute(f'SELECT count(Image), Image FROM UserDesigns group by Image')
+        result = list(cursor)
+        count = [i[0] for i in result]
+        image = [i[1] for i in result]
+        results = tuple(image)
+        cursor.execute(f'Select * from Designs where Images in {results[:-1] if len(results) < 1 else results} and Categories = "{cat}"')
+        # print(results)
+        results = list(cursor)
+        designs = []
+        for i in range(len(results)):
+            designs.append({
+                    'Image' : results[i][0],
+                    'City' : results[i][1],
+                    'Style' : results[i][2],
+                    'Category' : results[i][3],
+                    'Likes' : count[i]
+            })
+        designs  = sorted(designs, key=lambda x: x['Likes'], reverse=True)
+        conn.close()
+        return designs
+    except Exception as e:
+        # cursor.rollback()
+        return False
+    # else:
+    #     if conn.connected == 1:
+    #         conn.closed()
+
+def get_most_liked_designs_cat_city_wise(cat, city):
+    try:
+        conn = connect()
+        cursor = conn.cursor()
+        cursor.execute(f'SELECT count(Image), Image FROM UserDesigns group by Image')
+        result = list(cursor)
+        count = [i[0] for i in result]
+        image = [i[1] for i in result]
+        results = tuple(image)
+        cursor.execute(f'Select * from Designs where Images in {results[:-1] if len(results) < 1 else results} and Categories = "{cat}" and City = "{city}"')
+        # print(results)
+        results = list(cursor)
+        designs = []
+        for i in range(len(results)):
+            designs.append({
+                    'Image' : results[i][0],
+                    'City' : results[i][1],
+                    'Style' : results[i][2],
+                    'Category' : results[i][3],
+                    'Likes' : count[i]
+            })
+        designs  = sorted(designs, key=lambda x: x['Likes'], reverse=True)
+        conn.close()
+        return designs
+    except Exception as e:
+        cursor.rollback()
+        return False
+    # else:
+    #     if conn.connected == 1:
+    #         conn.closed()
+
+def get_search_items():
+    try:
+        conn = connect()
+        cursor = conn.cursor()
+        cursor.execute("""
+            select * from Designs where City in ("Rawalpindi", "Islamabad")
+        """)
+        result = list(cursor)
+        conn.close()
+        search_list_01 = unique([i[-1] for i in result])
+        search_list_02 = unique([i[-2] for i in result])
+        search_list_03 = unique([i[-3] for i in result])
+        search_list = list(itertools.chain(search_list_01,search_list_02,search_list_03))
+        return search_list 
+    except Exception:
+        conn.close()
+        return False
+
+
 
 def data_insertion():
     df = pd.DataFrame()
@@ -304,12 +390,12 @@ def data_insertion():
 
 if __name__=="__main__":
     # print(get_user_designs('someone'))
-    print(user_likes_design('https://kitandkaboodle.com/wp-content/uploads/2021/10/6R3A0151-1-1024x1024.jpg', 'someone'))
+    print(get_search_items())
     # data_insertio n()
     # conn = connect()
     # cursor = conn.cursor()
     # sql_query = """
-    #     select * from UserDesigns
+    #     PRAGMA table_info(Designs);
     # """
     # sql_query = """
     #     CREATE TABLE Designs(
