@@ -7,7 +7,7 @@ import jwt
 import json
 # from bson import json_util
 from functools import wraps
-from db import get_user, get_users, post_user, update_user, get_rwp_designs, get_all_designs, get_isb_designs, get_user_designs, user_dislikes_design, user_likes_design, get_search_items, get_most_liked_designs_cat_wise, get_most_liked_designs_cat_city_wise
+from db import get_user, get_users, post_user, update_user, get_rwp_designs, get_all_designs, get_isb_designs, get_user_designs, user_dislikes_design, user_likes_design, get_search_items, get_most_liked_designs_cat_wise, get_most_liked_designs_cat_city_wise, get_category_items
 
 app = Flask(__name__)
 api = Api(app)
@@ -64,7 +64,7 @@ class Login(Resource):
             token = jwt.encode({
                     'username': user['Username'],
                     'fullName': user['FirstName'] + " " + user['LastName'],
-                    'exp': datetime.datetime.utcnow() + datetime.timedelta(minutes=1440)
+                    # 'exp': datetime.datetime.utcnow() + datetime.timedelta(minutes=1440)
                 },
                     app.config['SECRET_KEY']
                 )
@@ -201,6 +201,15 @@ class GetDesignList(Resource):
         except Exception:
             return {'msg': 'Error updating user'}, 500
 
+class GetCatList(Resource):
+    @token_required
+    def get(self, current_user):
+        try:
+            resp = get_category_items()
+            return {'msg': resp}, 200
+        except Exception:
+            return {'msg': 'Error updating user'}, 500
+
 
 class GetCatWiseDesign(Resource):
     @token_required
@@ -236,6 +245,7 @@ api.add_resource(RwpDesigns, '/api/designs/rawalpindi')
 api.add_resource(IsbDesigns, '/api/designs/islamabad')
 api.add_resource(GetUserLikes, '/api/designs/userdesign')
 api.add_resource(GetDesignList, '/api/searchlist')
+api.add_resource(GetCatList, '/api/catlist')
 api.add_resource(GetCatWiseDesign, '/api/designs/cat')
 api.add_resource(GetCatCityWiseDesign, '/api/designs/cat/city')
 

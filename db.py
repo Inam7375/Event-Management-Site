@@ -347,6 +347,21 @@ def get_search_items():
         return False
 
 
+def get_category_items():
+    try:
+        conn = connect()
+        cursor = conn.cursor()
+        cursor.execute("""
+            select * from Designs where City in ("Rawalpindi", "Islamabad")
+        """)
+        result = list(cursor)
+        conn.close()
+        search_list = unique([i[-1] for i in result])        
+        return search_list 
+    except Exception:
+        conn.close()
+        return False
+
 
 def data_insertion():
     df = pd.DataFrame()
@@ -390,12 +405,12 @@ def data_insertion():
 
 if __name__=="__main__":
     # print(get_user_designs('someone'))
-    print(get_search_items())
+    print(get_category_items())
     # data_insertio n()
     # conn = connect()
     # cursor = conn.cursor()
     # sql_query = """
-    #     PRAGMA table_info(Designs);
+    #     select * from Designs
     # """
     # sql_query = """
     #     CREATE TABLE Designs(
