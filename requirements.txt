@@ -7,3 +7,4 @@ datetime
 PyJWT==1.7.1
 bson
 pandas
+pickle

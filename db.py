@@ -6,10 +6,27 @@ import pandas as pd
 import os
 import numpy as np
 import itertools 
+import random
+import pickle
+
 
 def unique(list1):
     x = np.array(list1)
     return list(np.unique(x))
+
+
+"""
+IN CASE OF ML MODEL
+"""
+
+def load_model(filename):
+    pkl_filename = filename + ".pkl"
+
+    # Load from file
+    with open(pkl_filename, 'rb') as file:
+        pickle_model = pickle.load(file)
+    return pickle_model
+
 
 # df = pd.read_csv('creds.csv')
 def connect():
@@ -403,21 +420,83 @@ def data_insertion():
         if conn.connected == 1:
             conn.closed()
 
+def ratings_table_insertion(user, image, rating):
+    try:
+        conn = connect()
+        cursor = conn.cursor()
+        sql_query = f"""
+            insert into Ratings 
+            values (
+                "{image}",
+                "{user}",
+                "{rating}"
+            )
+        """
+        cursor.execute(sql_query)
+        conn.commit()
+        conn.close()
+        return "Thankyou for your feedback"
+    except Exception as e:
+        print(e)
+        conn.rollback()
+        return False
+
+def predictions(uname):
+    """
+        Fetch all images
+    """
+    conn = connect()
+    cursor = conn.cursor()
+    sql_query = 'select * from Ratings'
+    cursor.execute(sql_query)
+    ratings = list(cursor)
+    ratings = [list(i) for i in ratings]
+    if len(ratings) > 0:
+        userRatings = [i for i in ratings if i[1] == uname]
+        if len(userRatings) > 1:
+            ratedImages = tuple([i[1] for i in userRatings])
+            sql_query = f"SELECT * FROM Designs where City in ('Rawalpindi', 'Islamabad') and Images not in {ratedImages}"
+            cursor.execute(sql_query)
+            results = list(cursor)
+            conn.close()
+            data = [list(i) for i in results]
+            df = pd.DataFrame(data = data, columns = [
+                'image',
+                'city',
+                'category',
+                'style'
+            ])
+
+            svd = load_model("SVD")
+
+            df['Estimate_Score'] = df['image'].apply(lambda x: svd.predict(x, 'johny').est)
+            df = df.sort_values(by=['Estimate_Score'], ascending=False)
+            records = df.head().to_dict('records')
+            records = [{k: v for k, v in d.items() if k != 'Estimate_Score'} for d in records]
+
+            return records
+        else:
+            return "You have not rated enough designs. Please use this app a little more"
+
+    else:
+        return "You have not rated enough designs. Please use this app a little more"
+
+
 if __name__=="__main__":
-    # print(get_user_designs('someone'))
-    print(get_category_items())
-    # data_insertio n()
+    # print(get_rwp_designs("van123"))
+    print(predictions("johny"))
+    # data_insertion()
     # conn = connect()
     # cursor = conn.cursor()
     # sql_query = """
-    #     select * from Designs
+    #     select * from Ratings
     # """
     # sql_query = """
-    #     CREATE TABLE Designs(
-    #     [Images] [varchar](520) primary key,
-    #     [City] [varchar](255) NULL,
-    #     [Styles] [varchar](255) NULL,
-    #     [Categories] [nvarchar](255) NULL)
+    #     CREATE TABLE Ratings(
+    #     [Images] [varchar](520) NOT NULL,
+    #     [Users] [varchar](255) NOT NULL,
+    #     [Ratings] [real] NOT NULL
+    #     )
     # """
     # print(list(cursor.execute(sql_query)))
     # print(get_users())

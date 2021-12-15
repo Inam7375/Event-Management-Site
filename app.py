@@ -7,7 +7,7 @@ import jwt
 import json
 # from bson import json_util
 from functools import wraps
-from db import get_user, get_users, post_user, update_user, get_rwp_designs, get_all_designs, get_isb_designs, get_user_designs, user_dislikes_design, user_likes_design, get_search_items, get_most_liked_designs_cat_wise, get_most_liked_designs_cat_city_wise, get_category_items
+from db import get_user, get_users, post_user, update_user, get_rwp_designs, get_all_designs, get_isb_designs, get_user_designs, user_dislikes_design, user_likes_design, get_search_items, get_most_liked_designs_cat_wise, get_most_liked_designs_cat_city_wise, get_category_items, ratings_table_insertion, predictions
 
 app = Flask(__name__)
 api = Api(app)
@@ -190,7 +190,7 @@ class UserActions(Resource):
             resp = update_user(username, firstname, lastname, city, email, password)
             return {'msg': resp}, 200
         except Exception:
-            return {'msg': 'Error updating user'}, 500
+            return {'msg': 'Error Updating User'}, 500
 
 class GetDesignList(Resource):
     @token_required
@@ -199,7 +199,7 @@ class GetDesignList(Resource):
             resp = get_search_items()
             return {'msg': resp}, 200
         except Exception:
-            return {'msg': 'Error updating user'}, 500
+            return {'msg': 'Error Performing Operation'}, 500
 
 class GetCatList(Resource):
     @token_required
@@ -208,7 +208,7 @@ class GetCatList(Resource):
             resp = get_category_items()
             return {'msg': resp}, 200
         except Exception:
-            return {'msg': 'Error updating user'}, 500
+            return {'msg': 'Error Performing Operation'}, 500
 
 
 class GetCatWiseDesign(Resource):
@@ -220,7 +220,7 @@ class GetCatWiseDesign(Resource):
             resp = get_most_liked_designs_cat_wise(cat)
             return {'msg': resp}, 200
         except Exception:
-            return {'msg': 'Error creating user'}, 500
+            return {'msg': 'Error Performing Operation'}, 500
    
 
 class GetCatCityWiseDesign(Resource):
@@ -233,7 +233,34 @@ class GetCatCityWiseDesign(Resource):
             resp = get_most_liked_designs_cat_city_wise(cat, city)
             return {'msg': resp}, 200
         except Exception:
-            return {'msg': 'Error creating user'}, 500
+            return {'msg': 'Error Performing Operation'}, 500
+    
+class RateDesigns(Resource):
+    @token_required
+    def post(self, current_user):
+        data = request.get_json(force=True)
+        try:
+            token = request.headers['x-access-token']
+            tokenData = jwt.decode(token, 'mysecretkey')
+            user = tokenData['username']
+            image = data['image']
+            rating = data['rating']
+            resp = ratings_table_insertion(user, image, rating)
+            return {'msg': resp}, 200
+        except Exception:
+            return {'msg': 'Error Performing Operation'}, 500
+    
+class GetPredictions(Resource):
+    @token_required
+    def get(self, current_user):
+        try:
+            token = request.headers['x-access-token']
+            data = jwt.decode(token, 'mysecretkey')
+            user = data['username']
+            resp = predictions(user)
+            return {'Designs': resp}, 200
+        except Exception:
+            return {'msg': 'Error Performing Operation'}, 500
     
 
 api.add_resource(Login, '/api/login')
@@ -248,6 +275,8 @@ api.add_resource(GetDesignList, '/api/searchlist')
 api.add_resource(GetCatList, '/api/catlist')
 api.add_resource(GetCatWiseDesign, '/api/designs/cat')
 api.add_resource(GetCatCityWiseDesign, '/api/designs/cat/city')
+api.add_resource(RateDesigns, '/api/designs/rate')
+api.add_resource(GetPredictions, '/api/designs/preds')
 
 if __name__=='__main__':
     app.run(debug=True)
