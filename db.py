@@ -10,6 +10,7 @@ import random
 import pickle
 
 
+
 def unique(list1):
     x = np.array(list1)
     return list(np.unique(x))
@@ -425,17 +426,24 @@ def ratings_table_insertion(user, image, rating):
         conn = connect()
         cursor = conn.cursor()
         sql_query = f"""
-            insert into Ratings 
-            values (
-                "{image}",
-                "{user}",
-                "{rating}"
-            )
+            select count(Images) from Ratings where Images = "{image}" and Users = "{user}"
         """
         cursor.execute(sql_query)
-        conn.commit()
-        conn.close()
-        return "Thankyou for your feedback"
+        if len(list(cursor)) < 1:
+            sql_query = f"""
+                insert into Ratings 
+                values (
+                    "{image}",
+                    "{user}",
+                    "{rating}"
+                )
+            """
+            cursor.execute(sql_query)
+            conn.commit()
+            conn.close()
+            return "Thankyou for your feedback"
+        else:
+            return "You already have provided feedback for this image"
     except Exception as e:
         print(e)
         conn.rollback()
@@ -484,7 +492,11 @@ def predictions(uname):
 
 if __name__=="__main__":
     # print(get_rwp_designs("van123"))
-    print(predictions("johny"))
+    print(ratings_table_insertion(
+        "someone",
+        "https://kitandkaboodle.com/wp-content/uploads/2021/10/6R3A0294-683x1024.jpg",
+        "4"
+    ))
     # data_insertion()
     # conn = connect()
     # cursor = conn.cursor()
