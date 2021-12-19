@@ -152,15 +152,24 @@ def get_rwp_designs(username):
         result = list(cursor)
         cursor.execute(f'SELECT Image FROM UserDesigns where Username = "{username}"')
         liked_images = [i[0] for i in list(cursor)]
-        print(liked_images)
+        cursor.execute(f'select Ratings, Images from Ratings where Users = "{username}"')
+        rated_images = list(cursor)
+        ratings_index = [i[0] for i in rated_images]
+        rated_images = [i[1] for i in rated_images]
+        # print(rated_images)
         designs = []
         for i in range(len(result)):
+            rating = 0
+            for j in range(len(rated_images)):
+                if rated_images[j] == result[i][0]:
+                    rating = ratings_index[j]
             designs.append({
                     'Image' : result[i][0],
                     'City' : result[i][1],
                     'Style' : result[i][2],
                     'Category' : result[i][3],
-                    'Liked' : 'Yes' if  result[i][0] in liked_images else 'No'   
+                    'Liked' : 'Yes' if  result[i][0] in liked_images else 'No',
+                    'Rating' : rating
             })
         conn.close()
         return designs
@@ -179,14 +188,24 @@ def get_isb_designs(username):
         result = list(cursor)
         cursor.execute(f'SELECT Image FROM UserDesigns where Username = "{username}"')
         liked_images = [i[0] for i in list(cursor)]
+        cursor.execute(f'select Ratings, Images from Ratings where Users = "{username}"')
+        rated_images = list(cursor)
+        ratings_index = [i[0] for i in rated_images]
+        rated_images = [i[1] for i in rated_images]
         designs = []
         for i in range(len(result)):
+            rating = 0
+            for j in range(len(rated_images)):
+                if rated_images[j] == result[i][0]:
+                    rating = ratings_index[j]
             designs.append({
                     'Image' : result[i][0],
                     'City' : result[i][1],
                     'Style' : result[i][2],
                     'Category' : result[i][3],
-                    'Liked' : 'Yes' if  result[i][0] in liked_images else 'No'   
+                    'Liked' : 'Yes' if  result[i][0] in liked_images else 'No',
+                    'Rating' : rating
+  
 
             })
         conn.close()
@@ -491,12 +510,12 @@ def predictions(uname):
 
 
 if __name__=="__main__":
-    # print(get_rwp_designs("van123"))
-    print(ratings_table_insertion(
-        "someone",
-        "https://kitandkaboodle.com/wp-content/uploads/2021/10/6R3A0294-683x1024.jpg",
-        "4"
-    ))
+    print(get_isb_designs("van123"))
+    # print(ratings_table_insertion(
+    #     "someone",
+    #     "https://kitandkaboodle.com/wp-content/uploads/2021/10/6R3A0294-683x1024.jpg",
+    #     "4"
+    # ))
     # data_insertion()
     # conn = connect()
     # cursor = conn.cursor()
