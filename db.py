@@ -444,25 +444,25 @@ def ratings_table_insertion(user, image, rating):
     try:
         conn = connect()
         cursor = conn.cursor()
+        # sql_query = f"""
+        #     select count(Images) from Ratings where Images = "{image}" and Users = "{user}"
+        # """
+        # cursor.execute(sql_query)
+        # if len(list(cursor)) < 1:
         sql_query = f"""
-            select count(Images) from Ratings where Images = "{image}" and Users = "{user}"
+            insert into Ratings 
+            values (
+                "{image}",
+                "{user}",
+                "{rating}"
+            )
         """
         cursor.execute(sql_query)
-        if len(list(cursor)) < 1:
-            sql_query = f"""
-                insert into Ratings 
-                values (
-                    "{image}",
-                    "{user}",
-                    "{rating}"
-                )
-            """
-            cursor.execute(sql_query)
-            conn.commit()
-            conn.close()
-            return "Thankyou for your feedback"
-        else:
-            return "You already have provided feedback for this image"
+        conn.commit()
+        conn.close()
+        return "Thankyou for your feedback"
+        # else:
+        #     return "You already have provided feedback for this image"
     except Exception as e:
         print(e)
         conn.rollback()
