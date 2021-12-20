@@ -510,7 +510,7 @@ def predictions(uname):
 
 
 if __name__=="__main__":
-    print(get_isb_designs("van123"))
+    print(get_rwp_designs('someone'))
     # print(ratings_table_insertion(
     #     "someone",
     #     "https://kitandkaboodle.com/wp-content/uploads/2021/10/6R3A0294-683x1024.jpg",
@@ -520,7 +520,7 @@ if __name__=="__main__":
     # conn = connect()
     # cursor = conn.cursor()
     # sql_query = """
-    #     select * from Ratings
+    #     delete from Designs
     # """
     # sql_query = """
     #     CREATE TABLE Ratings(
